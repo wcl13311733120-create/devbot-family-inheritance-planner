@@ -1,0 +1,12 @@
+{
+  "name": "family-inheritance-planner",
+  "version": "1.0.0",
+  "description": "跨文化家庭遗产规划助手 MVP — 遗嘱模板、赡养协议、遗产清单、风险评估、法律知识库",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.3"
+  }
+}
