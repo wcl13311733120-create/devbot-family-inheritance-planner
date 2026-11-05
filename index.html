@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>跨文化家庭遗产规划助手</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; color: #333; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+  header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 24px; }
+  header h1 { font-size: 28px; margin-bottom: 8px; }
+  header p { opacity: 0.9; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .tab { padding: 10px 20px; border: none; background: white; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .tab.active { background: #667eea; color: white; }
+  .panel { display: none; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+  .panel.active { display: block; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; }
+  .card h3 { margin-bottom: 8px; color: #667eea; }
+  .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; background: #667eea; color: white; transition: background 0.2s; }
+  .btn:hover { background: #5a67d8; }
+  .btn-secondary { background: #e5e7eb; color: #333; }
+  .btn-secondary:hover { background: #d1d5db; }
+  input, textarea, select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; margin-bottom: 12px; }
+  label { display: block; margin-bottom: 4px; font-weight: 600; font-size: 13px; color: #555; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .result { background: #f0f4ff; border-left: 4px solid #667eea; padding: 16px; border-radius: 6px; margin-top: 16px; white-space: pre-wrap; font-family: monospace; font-size: 13px; }
+  .risk-high { color: #dc2626; font-weight: bold; }
+  .risk-medium { color: #d97706; font-weight: bold; }
+  .risk-low { color: #16a34a; font-weight: bold; }
+  .knowledge-card { border-left: 4px solid #764ba2; padding: 12px 16px; margin-bottom: 12px; background: #faf5ff; border-radius: 6px; }
+  .knowledge-card h4 { margin-bottom: 4px; color: #764ba2; }
+  .tag { display: inline-block; background: #e5e7eb; padding: 2px 8px; border-radius: 4px; font-size: 11px; margin-right: 4px; }
+  .case-list { list-style: none; }
+  .case-list li { padding: 12px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center; }
+  .empty { text-align: center; color: #999; padding: 40px; }
+  footer { text-align: center; margin-top: 24px; color: #999; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>👨‍👩‍👧‍👦 跨文化家庭遗产规划助手</h1>
+    <p>遗嘱模板 · 赡养协议 · 遗产清单 · 风险评估 · 跨文化法律知识库</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" data-panel="risk">风险评估</button>
+    <button class="tab" data-panel="templates">法律模板</button>
+    <button class="tab" data-panel="knowledge">知识库</button>
+    <button class="tab" data-panel="cases">案件管理</button>
+  </div>
+
+  <div class="panel active" id="panel-risk">
+    <h2>家庭遗产风险评估</h2>
+    <p style="margin-bottom:16px;color:#666;">填写家庭信息，获取继承风险评分与建议。</p>
+    <div class="form-row">
+      <div><label>家庭名称</label><input id="risk-family" placeholder="如：张氏家族"></div>
+      <div><label>子女数量</label><input id="risk-children" type="number" value="2" min="0"></div>
+    </div>
+    <div class="form-row">
+      <div><label><input type="checkbox" id="risk-will"> 已立遗嘱</label></div>
+      <div><label><input type="checkbox" id="risk-agreement"> 已签赡养协议</label></div>
+    </div>
+    <div class="form-row">
+      <div><label><input type="checkbox" id="risk-cross"> 跨境资产</label></div>
+      <div><label><input type="checkbox" id="risk-debt"> 存在债务</label></div>
+    </div>
+    <div class="form-row">
+      <div><label><input type="checkbox" id="risk-insurance"> 有保险保障</label></div>
+    </div>
+    <button class="btn" onclick="doAssess()">评估风险</button>
+    <div id="risk-result"></div>
+  </div>
+
+  <div class="panel" id="panel-templates">
+    <h2>法律文书模板生成</h2>
+    <p style="margin-bottom:16px;color:#666;">选择模板类型，填写信息，生成可打印的法律文书。</p>
+    <label>模板类型</label>
+    <select id="tpl-type">
+      <option value="will">遗嘱模板</option>
+      <option value="agreement">赡养协议模板</option>
+      <option value="checklist">遗产清单模板</option>
+    </select>
+    <div id="tpl-fields"></div>
+    <button class="btn" onclick="genTemplate()">生成文书</button>
+    <div id="tpl-result"></div>
+  </div>
+
+  <div class="panel" id="panel-knowledge">
+    <h2>跨文化家庭法律知识库</h2>
+    <div style="margin-bottom:16px;">
+      <input id="kb-search" placeholder="搜索关键词..." oninput="searchKB()">
+    </div>
+    <div id="kb-tags"></div>
+    <div id="kb-list"></div>
+  </div>
+
+  <div class="panel" id="panel-cases">
+    <h2>家庭案件记录</h2>
+    <div class="form-row">
+      <div><label>家庭名称</label><input id="case-name" placeholder="如：李氏家族"></div>
+      <div><label>资产描述</label><input id="case-assets" placeholder="房产、存款等"></div>
+    </div>
+    <label>备注</label>
+    <textarea id="case-notes" rows="3" placeholder="特殊情况说明..."></textarea>
+    <button class="btn" onclick="saveCase()">保存案件</button>
+    <h3 style="margin-top:20px;">案件列表</h3>
+    <ul class="case-list" id="case-list"></ul>
+  </div>
+
+  <footer>跨文化家庭遗产规划助手 MVP · DevBot · 数据本地存储</footer>
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById('panel-' + t.dataset.panel).classList.add('active');
+      if (t.dataset.panel === 'knowledge') loadKB();
+      if (t.dataset.panel === 'cases') loadCases();
+    });
+  });
+
+  async function doAssess() {
+    const body = {
+      hasWill: document.getElementById('risk-will').checked,
+      hasAgreement: document.getElementById('risk-agreement').checked,
+      crossBorder: document.getElementById('risk-cross').checked,
+      hasDebt: document.getElementById('risk-debt').checked,
+      hasInsurance: document.getElementById('risk-insurance').checked,
+      childrenCount: parseInt(document.getElementById('risk-children').value) || 0
+    };
+    const res = await fetch('/api/assess', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    const cls = data.level === '高' ? 'risk-high' : data.level === '中' ? 'risk-medium' : 'risk-low';
+    document.getElementById('risk-result').innerHTML = `
+      <div class="result">
+        <strong>风险评分：</strong><span class="${cls}">${data.score} / 100（${data.level}风险）</span>
+        <br><br><strong>风险项：</strong>
+        ${data.risks.length ? data.risks.map(r => '• ' + r).join('<br>') : '未发现明显风险'}
+        <br><br><strong>建议：</strong>${data.level === '高' ? '建议尽快立遗嘱、签订赡养协议、咨询律师。' : data.level === '中' ? '建议完善遗嘱与保险保障。' : '风险较低，定期更新资产清单即可。'}
+      </div>`;
+  }
+
+  const tplFields = {
+    will: ['testator:立遗嘱人', 'spouse:配偶', 'children:子女', 'assets:财产清单', 'shares:继承比例', 'executor:遗嘱执行人', 'guardian:监护人'],
+    agreement: ['elder:被赡养人', 'caregiver:赡养人', 'method:赡养方式', 'cost:费用分摊', 'housing:居住安排', 'dispute:争议解决'],
+    checklist: ['property:房产', 'finance:金融资产', 'insurance:保险', 'debt:债务', 'digital:数字资产', 'sentimental:纪念物品', 'total:总估算价值']
+  };
+  function renderTplFields() {
+    const type = document.getElementById('tpl-type').value;
+    const container = document.getElementById('tpl-fields');
+    container.innerHTML = tplFields[type].map(f => {
+      const [key, label] = f.split(':');
+      return `<label>${label}</label><input id="tpl-${key}" placeholder="${label}">`;
+    }).join('');
+  }
+  document.getElementById('tpl-type').addEventListener('change', renderTplFields);
+  renderTplFields();
+
+  async function genTemplate() {
+    const type = document.getElementById('tpl-type').value;
+    const body = {};
+    tplFields[type].forEach(f => {
+      const key = f.split(':')[0];
+      body[key] = document.getElementById('tpl-' + key).value;
+    });
+    const res = await fetch('/api/templates/' + type + '/generate', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const data = await res.json();
+    document.getElementById('tpl-result').innerHTML = `<div class="result">${data.content}</div>`;
+  }
+
+  async function loadKB(tag) {
+    let url = '/api/knowledge';
+    if (tag) url += '?tag=' + encodeURIComponent(tag);
+    const res = await fetch(url);
+    const list = await res.json();
+    document.getElementById('kb-list').innerHTML = list.map(k => `
+      <div class="knowledge-card">
+        <h4>${k.title}</h4>
+        <p>${k.content}</p>
+        <div style="margin-top:6px;">${k.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      </div>`).join('') || '<div class="empty">无匹配结果</div>';
+    const tagsRes = await fetch('/api/knowledge/tags');
+    const tags = await tagsRes.json();
+    document.getElementById('kb-tags').innerHTML = '<div style="margin-bottom:12px;">' + tags.map(t => `<button class="btn btn-secondary" style="margin:2px;padding:4px 10px;font-size:12px;" onclick="loadKB('${t}')">${t}</button>`).join('') + `<button class="btn btn-secondary" style="margin:2px;padding:4px 10px;font-size:12px;" onclick="loadKB()">全部</button></div>`;
+  }
+  async function searchKB() {
+    const q = document.getElementById('kb-search').value;
+    const res = await fetch('/api/knowledge?q=' + encodeURIComponent(q));
+    const list = await res.json();
+    document.getElementById('kb-list').innerHTML = list.map(k => `
+      <div class="knowledge-card">
+        <h4>${k.title}</h4>
+        <p>${k.content}</p>
+        <div style="margin-top:6px;">${k.tags.map(t => `<span class="tag">${t}</span>`).join('')}</div>
+      </div>`).join('') || '<div class="empty">无匹配结果</div>';
+  }
+  loadKB();
+
+  async function saveCase() {
+    const body = {
+      familyName: document.getElementById('case-name').value,
+      assets: document.getElementById('case-assets').value,
+      notes: document.getElementById('case-notes').value
+    };
+    await fetch('/api/cases', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    document.getElementById('case-name').value = '';
+    document.getElementById('case-assets').value = '';
+    document.getElementById('case-notes').value = '';
+    loadCases();
+  }
+  async function loadCases() {
+    const res = await fetch('/api/cases');
+    const list = await res.json();
+    const ul = document.getElementById('case-list');
+    if (!list.length) { ul.innerHTML = '<div class="empty">暂无案件记录</div>'; return; }
+    ul.innerHTML = list.map(c => `<li><span>${c.familyName || '未命名'} <small style="color:#999;">${new Date(c.ts).toLocaleDateString()}</small></span><span class="${c.riskLevel === '高' ? 'risk-high' : c.riskLevel === '中' ? 'risk-medium' : 'risk-low'}">${c.riskLevel}风险 ${c.riskScore}分</span></li>`).join('');
+  }
+  loadCases();
+</script>
+</body>
+</html>
